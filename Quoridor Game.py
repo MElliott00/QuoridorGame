@@ -140,6 +140,8 @@ class MCTSNode:
             self.parent.backpropagate(result)  # Propagate the result to the parent node
 
 def MCTS_Search(rootState, iterations=500):
+    if rootState.isTerminal():
+        return rootState.player2_pos
     rootNode = MCTSNode(rootState)
 
     for _ in range(iterations):
