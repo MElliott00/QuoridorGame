@@ -22,14 +22,21 @@ class MCTSNode:
 
     def expand(self):
         availableMoves = self.state.getLegalMoves()
+        existingMove = {child.state.player1_pos if self.state.player_turn == 1 else child.state.player2_pos for child in self.children}
         for move in availableMoves:
-            newState = self.state.applyMoves(move[:2])
-            childNode = MCTSNode(newState, parent=self)
-            self.children.append(childNode)
+            newPos = move[:2]
+            if newPos not in existingMove:
+                newState = self.state.applyMoves(move[:2])
+                childNode = MCTSNode(newState, parent=self)
+                self.children.append(childNode)
+                return
 
     def simulate(self):
         currentState = copy.deepcopy(self.state)
         while not currentState.isTerminal():
+            legalMoves = currentState.getLegalMoves()
+            if not legalMoves:
+                break #Avoids infinite loop
             move = random.choice(currentState.getLegalMoves())
             currentState = currentState.applyMoves(move[:2])
         return currentState.getWinner()
@@ -44,14 +51,27 @@ class MCTSNode:
 def MCTS_Search(rootState, iterations=500):
     if rootState.isTerminal():
         return rootState.player2_pos
+    
     rootNode = MCTSNode(rootState)
+
     for _ in range(iterations):
         node = rootNode
-        while not node.isFullyExpanded() and node.children:
+
+        #Selection
+        while node.children:
             node = node.bestChild()
+            if not node.ifFullyExpanded():
+                break
+
+        #Expansion
         if not node.state.isTerminal():
             node.expand()
+
+        #Simulation
         result = node.simulate()
+        #Backpropagation
         node.backpropagate(result)
+        
+    #Choose best move
     bestMove = rootNode.bestChild(explorationWeight=0)
     return bestMove.state.player2_pos
