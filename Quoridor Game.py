@@ -178,13 +178,16 @@ def draw_board():
         for col in range(GRID_SIZE):
             pygame.draw.rect(screen, LIGHT_GRAY, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
             pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 2)
-    
-    # Draw barriers
+
+    # Draw barriers as thick lines along the grid lines
+    barrier_thickness = 10  # Set the thickness for the barriers
     for barrier in barriers:
         if barrier[2] == 'horizontal':
-            pygame.draw.rect(screen, BARRIER_COLOR, (barrier[1] * CELL_SIZE, barrier[0] * CELL_SIZE, CELL_SIZE * 2, CELL_SIZE))
+            # Draw a horizontal barrier across two tiles, extending above and below the line
+            pygame.draw.rect(screen, BARRIER_COLOR, (barrier[1] * CELL_SIZE, barrier[0] * CELL_SIZE - barrier_thickness // 2, CELL_SIZE * 2, barrier_thickness))
         elif barrier[2] == 'vertical':
-            pygame.draw.rect(screen, BARRIER_COLOR, (barrier[1] * CELL_SIZE, barrier[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE * 2))
+            # Draw a vertical barrier across two tiles, extending left and right of the line
+            pygame.draw.rect(screen, BARRIER_COLOR, (barrier[1] * CELL_SIZE - barrier_thickness // 2, barrier[0] * CELL_SIZE, barrier_thickness, CELL_SIZE * 2))
 
     # Draw players' positions
     pygame.draw.circle(screen, BLUE, (player1_pos[1] * CELL_SIZE + CELL_SIZE // 2, player1_pos[0] * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
@@ -196,10 +199,13 @@ def getGridPos(mousePos):
 
 def placeBarrierAtClick(mousePos, orientation):
     row, col = getGridPos(mousePos)
-    # Place only if valid
-    if 0 <= row < GRID_SIZE and 0 <= col < GRID_SIZE:
-        if not any((barrier[0] == row and barrier[1] == col) for barrier in barriers):
-            barriers.append((row, col, orientation))
+    # Place barriers only on grid lines
+    if orientation == 'horizontal' and 0 <= row < GRID_SIZE and 0 <= col < GRID_SIZE - 1:
+        if not any((barrier[0] == row and barrier[1] == col and barrier[2] == 'horizontal') for barrier in barriers):
+            barriers.append((row, col, 'horizontal'))
+    elif orientation == 'vertical' and 0 <= row < GRID_SIZE - 1 and 0 <= col < GRID_SIZE:
+        if not any((barrier[0] == row and barrier[1] == col and barrier[2] == 'vertical') for barrier in barriers):
+            barriers.append((row, col, 'vertical'))
 
 # AI Move Feedback: Simple message to show it's the AI's turn
 font = pygame.font.SysFont(None, 40)
