@@ -25,14 +25,40 @@ class QuoridorState:
     def isMoveBlocked(self, start_pos, end_pos):
         startRow, startCol = start_pos
         endRow, endCol = end_pos
-        for barrier in self.barriers:
-            barrierRow, barrierCol, orientation = barrier
-            if orientation == 'horizontal':
-                if startRow == endRow and (startCol >= barrierCol and startCol <= barrierCol + 1) and (endCol >= barrierCol + 1):
-                    return True
-            elif orientation == 'vertical':
-                if startCol == endCol and (startRow >= barrierRow and startRow <= barrierRow + 1) and (endRow >= barrierRow and endRow <= barrierRow + 1):
-                    return True 
+
+        # Check for vertical moves (moving up or down)
+        if startCol == endCol:
+            # Moving down: check if there is a horizontal barrier immediately below the start cell.
+            if endRow == startRow + 1:
+                for barrier in self.barriers:
+                    if barrier[2] == 'horizontal':
+                        # Assume a horizontal barrier at (row, col) covers columns col and col+1 at that row.
+                        # If the barrier's row equals endRow and the pawn's column is within its span, block the move.
+                        if barrier[0] == endRow and barrier[1] <= startCol < barrier[1] + 2:
+                            return True
+            # Moving up: check if there is a horizontal barrier immediately above the start cell.
+            elif endRow == startRow - 1:
+                for barrier in self.barriers:
+                    if barrier[2] == 'horizontal':
+                        if barrier[0] == startRow and barrier[1] <= startCol < barrier[1] + 2:
+                            return True
+
+        # Check for horizontal moves (moving left or right)
+        if startRow == endRow:
+            # Moving right: check if there is a vertical barrier immediately to the right of the start cell.
+            if endCol == startCol + 1:
+                for barrier in self.barriers:
+                    if barrier[2] == 'vertical':
+                        # Assume a vertical barrier at (row, col) covers rows row and row+1 at that column.
+                        if barrier[1] == endCol and barrier[0] <= startRow < barrier[0] + 2:
+                            return True
+            # Moving left: check if there is a vertical barrier immediately to the left of the start cell.
+            elif endCol == startCol - 1:
+                for barrier in self.barriers:
+                    if barrier[2] == 'vertical':
+                        if barrier[1] == startCol and barrier[0] <= startRow < barrier[0] + 2:
+                            return True
+
         return False
 
     def move_player(self, direction):
