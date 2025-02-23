@@ -26,33 +26,32 @@ class QuoridorState:
         startRow, startCol = start_pos
         endRow, endCol = end_pos
 
-        # Check for vertical moves (moving up or down)
+        # Check vertical movement (up or down)
         if startCol == endCol:
-            # Moving down: check if there is a horizontal barrier immediately below the start cell.
+            # Moving down: check if there's a horizontal barrier right below the start cell.
             if endRow == startRow + 1:
                 for barrier in self.barriers:
                     if barrier[2] == 'horizontal':
-                        # Assume a horizontal barrier at (row, col) covers columns col and col+1 at that row.
-                        # If the barrier's row equals endRow and the pawn's column is within its span, block the move.
+                        # A horizontal barrier placed at (row, col) blocks moving from row-1 to row.
+                        # Here, if the barrier's row equals endRow and covers the pawn's column, block it.
                         if barrier[0] == endRow and barrier[1] <= startCol < barrier[1] + 2:
                             return True
-            # Moving up: check if there is a horizontal barrier immediately above the start cell.
+            # Moving up: check if there's a horizontal barrier right above the start cell.
             elif endRow == startRow - 1:
                 for barrier in self.barriers:
                     if barrier[2] == 'horizontal':
                         if barrier[0] == startRow and barrier[1] <= startCol < barrier[1] + 2:
                             return True
 
-        # Check for horizontal moves (moving left or right)
+        # Check horizontal movement (left or right)
         if startRow == endRow:
-            # Moving right: check if there is a vertical barrier immediately to the right of the start cell.
+            # Moving right: check if there's a vertical barrier immediately to the right.
             if endCol == startCol + 1:
                 for barrier in self.barriers:
                     if barrier[2] == 'vertical':
-                        # Assume a vertical barrier at (row, col) covers rows row and row+1 at that column.
                         if barrier[1] == endCol and barrier[0] <= startRow < barrier[0] + 2:
                             return True
-            # Moving left: check if there is a vertical barrier immediately to the left of the start cell.
+            # Moving left: check if there's a vertical barrier immediately to the left.
             elif endCol == startCol - 1:
                 for barrier in self.barriers:
                     if barrier[2] == 'vertical':
@@ -60,6 +59,7 @@ class QuoridorState:
                             return True
 
         return False
+
 
     def move_player(self, direction):
         current_pos = self.player1_pos if self.player_turn == 1 else self.player2_pos
@@ -83,13 +83,15 @@ class QuoridorState:
             self.player_turn = 3 - self.player_turn
 
     def applyMoves(self, move):
-        new_state = QuoridorState(self.player1_pos, self.player2_pos, list(self.barriers), self.player_turn)
+    # Use the same barrier list (do not copy)
+        new_state = QuoridorState(self.player1_pos, self.player2_pos, self.barriers, self.player_turn)
         if new_state.player_turn == 1:
             new_state.player1_pos = move
         else:
             new_state.player2_pos = move
         new_state.player_turn = 3 - new_state.player_turn
         return new_state
+
 
     def isTerminal(self):
         # Game ends if Player 1 reaches the top row or Player 2 reaches the bottom row.

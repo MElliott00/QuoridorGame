@@ -38,6 +38,7 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 placeBarrierAtClick(event.pos, barrierOrientation, barriers)
+                currentState.barriers = barriers
 
             elif event.type == pygame.KEYDOWN and not aiTurn:
                 if event.key in {pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT}:
