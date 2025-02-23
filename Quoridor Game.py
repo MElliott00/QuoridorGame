@@ -79,9 +79,9 @@ class QuoridorState:
     def applyMoves(self, move):
         new_state = QuoridorState(self.player1_pos, self.player2_pos, list(self.barriers), self.player_turn)
         if new_state.player_turn == 1:
-            new_state.player1_pos = move
+            new_state.player1_pos = (move[0], move[1])
         else:
-            new_state.player2_pos = move
+            new_state.player2_pos = (move[0], move[1])
         new_state.player_turn = 3 - new_state.player_turn  # Switch turn
         return new_state
 
@@ -207,7 +207,7 @@ def placeBarrierAtClick(mousePos, orientation):
         if not any((barrier[0] == row and barrier[1] == col and barrier[2] == 'vertical') for barrier in barriers):
             barriers.append((row, col, 'vertical'))
 
-# AI Move Feedback: Simple message to show it's the AI's turn
+
 font = pygame.font.SysFont(None, 40)
 def show_message(message, color, position):
     text = font.render(message, True, color)
