@@ -1,4 +1,4 @@
-# game_state.py - stores game logic and QuoridorGame Class
+# game_state.py - stores game logic and QuoridorState Class
 
 import copy
 import random
