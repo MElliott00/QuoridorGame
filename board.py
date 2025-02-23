@@ -27,11 +27,11 @@ def draw_board(screen, barriers, player1_pos, player2_pos):
                               CELL_SIZE * 2))
     
     # Draw players
-    pygame.draw.circle(screen, BLUE,
+    pygame.draw.circle(screen, PINK,
                        (player1_pos[1] * CELL_SIZE + CELL_SIZE // 2,
                         player1_pos[0] * CELL_SIZE + CELL_SIZE // 2),
                        CELL_SIZE // 3)
-    pygame.draw.circle(screen, RED,
+    pygame.draw.circle(screen, GREEN,
                        (player2_pos[1] * CELL_SIZE + CELL_SIZE // 2,
                         player2_pos[0] * CELL_SIZE + CELL_SIZE // 2),
                        CELL_SIZE // 3)
