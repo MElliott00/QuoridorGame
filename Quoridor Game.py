@@ -127,8 +127,14 @@ class MCTSNode:
         # Simulates a random game from the current state until a terminal state is reached
         currentState = copy.deepcopy(self.state)  # Deep copy to avoid modifying the original state
         while not currentState.isTerminal():
-            move = random.choice(currentState.getLegalMoves())  # Random move selection
-            currentState = currentState.applyMoves(move[:2])
+            legalMoves = currentState.getLegalMoves()
+            if currentState.player_turn == 1:
+                legalMoves.sort(key=lambda move: move[0]) #Lower row is better
+            else: 
+                legalMoves.sort(key=lambda move: -move[0]) #Higher is better)
+           
+            move = random.choice(legalMoves[:3]) #Choose one of the best 3 moves
+            currentState = currentState.applyMoves(move[:2]) #Apply
         return currentState.getWinner()  # Return the winner of the simulation
 
     def backpropagate(self, result):
