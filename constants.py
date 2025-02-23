@@ -1,3 +1,13 @@
-# comment
-#comment
-#comment
+# constants.py
+
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+GRID_SIZE = 9
+CELL_SIZE = SCREEN_WIDTH // GRID_SIZE
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+LIGHT_GRAY = (200, 200, 200)
+BLUE = (0, 0, 255)
+RED = (255, 0, 0)
+BARRIER_COLOR = (0, 0, 0)
