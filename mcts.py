@@ -6,7 +6,7 @@ from game_state import QuoridorState
 
 class MCTSNode:
     def __init__(self, state, parent=None, player=None):
-        self.state = state
+        self.state = state  # Add this explicitly
         self.parent = parent
         self.children = []
         self.visits = 0
@@ -14,10 +14,10 @@ class MCTSNode:
         if parent is None:
             if player is None:
                 raise ValueError("Root node must have a player value.")
-            self.player = player  # AI player's perspective
+            self.player = player
         else:
-            # The move that led to this state was made by the opponent of the current turn.
             self.player = 3 - state.player_turn
+
 
     def isFullyExpanded(self):
         return len(self.children) == len(self.state.getLegalMoves())

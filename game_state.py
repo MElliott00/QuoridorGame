@@ -6,7 +6,7 @@ from constants import GRID_SIZE
 from collections import deque
 
 class QuoridorState:
-    def __init__(self, player1_pos, player2_pos, barriers, player_turn):
+    def __init__(self, player1_pos, player2_pos, barriers=None, player_turn=1):
         self.player1_pos = player1_pos
         self.player2_pos = player2_pos
         self.barriers = barriers
@@ -103,16 +103,23 @@ class QuoridorState:
         self.player_turn = 3 - self.player_turn
 
     def applyMoves(self, move):
-        new_state = QuoridorState(self.player1_pos, self.player2_pos, self.barriers, self.player_turn)
-        if new_state.player_turn == 1:
+        new_state = QuoridorState(
+            player1_pos=self.player1_pos,
+            player2_pos=self.player2_pos,
+            barriers=copy.deepcopy(self.barriers),
+            player_turn=3 - self.player_turn
+        )
+
+        if self.player_turn == 1:
             new_state.player1_pos = move
         else:
             new_state.player2_pos = move
-        new_state.player_turn = 3 - new_state.player_turn
-        # Copy barrier counts to the new state.
+
         new_state.player1_barriers = self.player1_barriers
         new_state.player2_barriers = self.player2_barriers
+
         return new_state
+
 
     def isTerminal(self):
         return self.player1_pos[0] == 0 or self.player2_pos[0] == GRID_SIZE - 1

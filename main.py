@@ -35,7 +35,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_running = False
-
             # Handle barrier placement.
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 success = placeBarrierAtClick(event.pos, barrierOrientation, currentState)
