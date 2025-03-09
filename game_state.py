@@ -45,13 +45,31 @@ class QuoridorState:
     def getLegalMoves(self):
         legal_moves = []
         row, col = self.player1_pos if self.player_turn == 1 else self.player2_pos
+        opponent_pos = self.player2_pos if self.player_turn == 1 else self.player1_pos
+
         for move_dir, (dr, dc) in [('up', (-1, 0)), ('down', (1, 0)),
-                                   ('left', (0, -1)), ('right', (0, 1))]:
+                                ('left', (0, -1)), ('right', (0, 1))]:
             new_row, new_col = row + dr, col + dc
-            if 0 <= new_row < GRID_SIZE and 0 <= new_col < GRID_SIZE:
+
+            # Check if moving into opponent
+            if (new_row, new_col) == opponent_pos:
+                # Try jumping over the opponent
+                jump_row, jump_col = new_row + dr, new_col + dc
+                if 0 <= jump_row < GRID_SIZE and 0 <= jump_col < GRID_SIZE and not self.isMoveBlocked((new_row, new_col), (jump_row, jump_col)):
+                    legal_moves.append((jump_row, jump_col, "jump-" + move_dir))
+                else:
+                    # If jumping is blocked, allow side moves
+                    for side_dr, side_dc in [(-dc, dr), (dc, -dr)]:  
+                        side_row, side_col = new_row + side_dr, new_col + side_dc
+                        if 0 <= side_row < GRID_SIZE and 0 <= side_col < GRID_SIZE and not self.isMoveBlocked((new_row, new_col), (side_row, side_col)):
+                            legal_moves.append((side_row, side_col, "side-move"))
+
+            # Normal move
+            elif 0 <= new_row < GRID_SIZE and 0 <= new_col < GRID_SIZE:
                 if not self.isMoveBlocked((row, col), (new_row, new_col)):
                     legal_moves.append((new_row, new_col, move_dir))
         return legal_moves
+
 
     def is_path_blocked(self):
         def bfs(start, goal_row):
