@@ -1,4 +1,3 @@
-# main.py
 import pygame
 import sys
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, WHITE, CELL_SIZE, GRID_SIZE
@@ -31,20 +30,22 @@ def main():
         if aiTurn:
             show_message(screen, "AI is thinking...", (255, 0, 0),
                          (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
-        
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_running = False
+
             # Handle barrier placement.
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 success = placeBarrierAtClick(event.pos, barrierOrientation, currentState)
                 if success:
-                    # Barrier placement counts as a move: switch turn.
                     currentState.player_turn = 3 - currentState.player_turn
-                    aiTurn = (currentState.player_turn == 2)  # Assume AI is player 2.
+                    if not currentState.isTerminal():  # ✅ Ensure AI doesn't move if game is over
+                        aiTurn = (currentState.player_turn == 2)
                     print("Barrier placed!")
                 else:
                     print("Invalid barrier placement!")
+
 
             # Handle movement keys.
             elif event.type == pygame.KEYDOWN and not aiTurn:
@@ -52,17 +53,27 @@ def main():
                     direction = {pygame.K_UP: 'up', pygame.K_DOWN: 'down',
                                  pygame.K_LEFT: 'left', pygame.K_RIGHT: 'right'}[event.key]
                     currentState.move_player(direction)
-                    aiTurn = (currentState.player_turn == 2)
+
+                    if currentState.isTerminal():
+                        winner = currentState.getWinner()
+                        show_message(screen, f"Player {winner} wins!", (0, 255, 0),
+                                     (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
+                        pygame.display.flip()
+                        pygame.time.wait(2000)
+                        game_running = False
+                        continue  # ✅ Prevent AI from making a move after the game ends
+
+                    aiTurn = (currentState.player_turn == 2)  # ✅ Ensure AI moves next if game isn't over
                 elif event.key == pygame.K_q:
                     barrierOrientation = 'horizontal'
                 elif event.key == pygame.K_e:
                     barrierOrientation = 'vertical'
-        
+
         # AI turn.
         if aiTurn:
             bestMove = MCTS_Search(currentState, iterations=500, ai_player=2)
             currentState = currentState.applyMoves(bestMove)
-            aiTurn = False
+
             if currentState.isTerminal():
                 winner = currentState.getWinner()
                 show_message(screen, f"Player {winner} wins!", (0, 255, 0),
@@ -70,6 +81,8 @@ def main():
                 pygame.display.flip()
                 pygame.time.wait(2000)
                 game_running = False
+            else:
+                aiTurn = False  # ✅ AI ends its turn only if game is still running
 
         pygame.display.flip()
         clock.tick(30)
