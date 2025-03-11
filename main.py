@@ -28,6 +28,16 @@ def main():
         screen.fill(WHITE)
         draw_board(screen, currentState.barriers, currentState.player1_pos, currentState.player2_pos)
         
+        #Checks for winner
+        if currentState.isTerminal():
+                winner = currentState.getWinner()
+                show_message(screen, f"Player {winner} wins!", (0, 255, 0),
+                             (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
+                pygame.display.flip()
+                pygame.time.wait(2000)
+                game_running = False
+                continue
+
         if aiTurn:
             show_message(screen, "AI is thinking...", (255, 0, 0),
                          (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
@@ -60,17 +70,12 @@ def main():
                     barrierOrientation = 'vertical'
         
         # AI turn.
-        if aiTurn:
-            bestMove = MCTS_Search(currentState, iterations=500, ai_player=2)
+        if aiTurn and not currentState.isTerminal():
+            print("Satring MCTS Search")
+            bestMove = MCTS_Search(currentState, iterations=1, ai_player=2)
+            print("MCTS Search Complete")
             currentState = currentState.applyMoves(bestMove)
             aiTurn = False
-            if currentState.isTerminal():
-                winner = currentState.getWinner()
-                show_message(screen, f"Player {winner} wins!", (0, 255, 0),
-                             (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
-                pygame.display.flip()
-                pygame.time.wait(2000)
-                game_running = False
 
         pygame.display.flip()
         clock.tick(30)

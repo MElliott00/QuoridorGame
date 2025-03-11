@@ -80,6 +80,7 @@ def placeBarrierAtClick(mousePos, orientation, state):
         state.barriers = original_barriers
         print("Wall placement blocked! Path must remain open.")
         return False
+    
 def show_message(screen, message, color, position, font):
     text = font.render(message, True, color)
     screen.blit(text, position)
