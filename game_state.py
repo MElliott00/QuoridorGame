@@ -117,8 +117,14 @@ class QuoridorState:
 
     def isBarrierPlacementValid(self, pos, orientation):
         for barrier in self.barriers:
-            if barrier == (pos, orientation):
+            if barrier == (pos[0], pos[1], orientation):
                 return False
+        temp_state = copy.deepcopy(self)
+        temp_state.barriers = self.barriers + [(pos[0], pos[1], orientation)]
+
+        if temp_state.is_path_blocked():
+            return False
+
         return True
 
     def is_path_blocked(self):
