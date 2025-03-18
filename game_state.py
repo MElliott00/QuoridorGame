@@ -81,34 +81,6 @@ class QuoridorState:
 
         return False
 
-    # def getShortestPathLength(self, player):
-    #     def bfs(start, goal_row):
-    #         from collections import deque
-    #         queue = deque([start])
-    #         visited = set([start])
-    #         distance = 0
-    #         while queue:
-    #             #distance += 1
-    #             for _ in range(len(queue)):
-    #                 row, col = queue.popleft()
-    #                 if row == goal_row:
-    #                     return distance
-    #                 #Explores neighbors
-    #                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-    #                     new_pos = (row + dr, col + dc)
-    #                     if 0 <= new_pos[0] < GRID_SIZE and 0 <= new_pos[1] < GRID_SIZE:
-    #                         if not self.isMoveBlocked((row, col), new_pos):
-    #                             visited.add(new_pos)
-    #                             queue.append(new_pos)
-                                
-    #             distance += 1
-    #         return float('inf')
-
-    #     if player == 1:
-    #         return bfs(self.player1_pos, 0)
-    #     else:
-    #         return bfs(self.player2_pos, GRID_SIZE - 1)
-
     def getShortestPathLength(self, player):
         return a_star(self.player1_pos, 0, self) if player == 1 else a_star(self.player2_pos, GRID_SIZE - 1, self)
 
@@ -153,27 +125,6 @@ class QuoridorState:
         print(f"Checking path blockage with barriers: {self.barriers}")
         return a_star(self.player1_pos, 0, self) == float('inf') or a_star(self.player2_pos, GRID_SIZE - 1, self) == float('inf')
 
-    # def is_path_blocked(self):
-    #     print(f"Checking path blockage with barriers: {self.barriers}")
-    #     def bfs(start, goal_row):
-    #         from collections import deque
-    #         queue = deque([start])
-    #         visited = set()
-    #         while queue:
-    #             row, col = queue.popleft()
-    #             if row == goal_row:
-    #                 return False
-    #             if (row, col) in visited:
-    #                 continue
-    #             visited.add((row, col))
-    #             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-    #                 new_pos = (row + dr, col + dc)
-    #                 if 0 <= new_pos[0] < GRID_SIZE and 0 <= new_pos[1] < GRID_SIZE:
-    #                     if not self.isMoveBlocked((row, col), new_pos):
-    #                         queue.append(new_pos)
-    #         return True
-
-    #     return bfs(self.player1_pos, 0) or bfs(self.player2_pos, GRID_SIZE - 1)
     
     def move_player(self, direction):
         row, col = self.player1_pos if self.player_turn == 1 else self.player2_pos
