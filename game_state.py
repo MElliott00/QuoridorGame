@@ -1,10 +1,7 @@
 # game_state.py - stores game logic and QuoridorState Class
-
 import copy
-import random
 import heapq
 from constants import GRID_SIZE
-from collections import deque
 
 def a_star(start, goal_row, state):
     priority_queue = []
@@ -30,7 +27,6 @@ def a_star(start, goal_row, state):
 
     return float('inf')  # No valid path
 
-
 class QuoridorState:
     def __init__(self, player1_pos, player2_pos, barriers, player_turn, lastMoveTaken=None):
         self.player1_pos = player1_pos
@@ -38,7 +34,6 @@ class QuoridorState:
         self.barriers = barriers
         self.player_turn = player_turn
         self.lastMoveTaken = lastMoveTaken
-        # Initialize barriers available for each player.
         self.player1_barriers = 10
         self.player2_barriers = 10
 
@@ -84,13 +79,11 @@ class QuoridorState:
     def getShortestPathLength(self, player):
         return a_star(self.player1_pos, 0, self) if player == 1 else a_star(self.player2_pos, GRID_SIZE - 1, self)
 
-
     def wallsRemaining(self, player):
         return self.player1_barriers if player == 1 else self.player2_barriers
 
-
     def getLegalMoves(self):
-        print(f"Checking legal moves. Current barriers: {self.barriers}")
+        #print(f"Checking legal moves. Current barriers: {self.barriers}")
         legal_moves = []
         row, col = self.player1_pos if self.player_turn == 1 else self.player2_pos
         for move_dir, (dr, dc) in [('up', (-1, 0)), ('down', (1, 0)),
@@ -112,7 +105,6 @@ class QuoridorState:
                             temp_state.barriers = temp_barriers
                             if not temp_state.is_path_blocked():
                                 legal_moves.append(("barrier", (r, c), orientation))
-
         return legal_moves
 
     def isBarrierPlacementValid(self, pos, orientation):
@@ -124,13 +116,12 @@ class QuoridorState:
 
         if temp_state.is_path_blocked():
             return False
-
+        
         return True
 
     def is_path_blocked(self):
-        print(f"Checking path blockage with barriers: {self.barriers}")
+        #print(f"Checking path blockage with barriers: {self.barriers}")
         return a_star(self.player1_pos, 0, self) == float('inf') or a_star(self.player2_pos, GRID_SIZE - 1, self) == float('inf')
-
     
     def move_player(self, direction):
         row, col = self.player1_pos if self.player_turn == 1 else self.player2_pos
@@ -156,7 +147,6 @@ class QuoridorState:
 
         print(f"Player {self.player_turn} moved {direction} to ({new_row}, {new_col})")
         print(f"Current Barriers: {self.barriers}")
-
         # Switch turns after a valid move.
         self.player_turn = 3 - self.player_turn
 
@@ -176,7 +166,6 @@ class QuoridorState:
                 new_state.player1_barriers -= 1
             else:
                 new_state.player2_barriers -= 1
-
         # Switch turns
         new_state.player_turn = 3 - self.player_turn
         # Store last move

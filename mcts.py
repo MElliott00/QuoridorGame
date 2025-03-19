@@ -8,9 +8,8 @@ def heuristic(state, player):
     player_path = state.getShortestPathLength(player)
     opponent_path = state.getShortestPathLength(3 - player)
     walls_left = state.wallsRemaining(player)
-    
-    return (opponent_path - player_path) + 0.1 * walls_left
 
+    return (opponent_path - player_path) + 0.1 * walls_left
 
 class MCTSNode:
     def __init__(self, state, parent=None, player=None, lastMoveTaken=None):
@@ -31,7 +30,7 @@ class MCTSNode:
     def isFullyExpanded(self):
         return len(self.children) == len(self.state.getLegalMoves())
 
-    def bestChild(self, explorationWeight=1.0):
+    def bestChild(self, explorationWeight=1.0):   #EXPLORATION WEIGHT = 1.0
         return max(self.children, key=lambda child: (child.wins / (child.visits + 1e-6)) +
                    explorationWeight * math.sqrt(math.log(self.visits + 1) / (child.visits + 1e-6)))
 
@@ -65,12 +64,12 @@ class MCTSNode:
         # Add child
         child_node = MCTSNode(best_state, parent=self, lastMoveTaken=best_move)
         self.children.append(child_node)
-        print(f"Expanding node with barriers: {best_state.barriers}")  # NEW barriers checked
+        #print(f"Expanding node with barriers: {best_state.barriers}")  # NEW barriers checked
         return child_node
 
     def simulate(self):
         currentState = copy.deepcopy(self.state)
-        print(f"Simulating from state with barriers: {currentState.barriers}")
+        #print(f"Simulating from state with barriers: {currentState.barriers}")
         while not currentState.isTerminal():
             legal_moves = currentState.getLegalMoves()
             if not legal_moves:
@@ -105,8 +104,7 @@ class MCTSNode:
         if self.parent:
             self.parent.backpropagate(result)
 
-
-def MCTS_Search(rootState, iterations=1, ai_player=2):
+def MCTS_Search(rootState, iterations=2, ai_player=2): #iterations
     if rootState.isTerminal():
         return rootState.player2_pos
     
@@ -127,5 +125,3 @@ def MCTS_Search(rootState, iterations=1, ai_player=2):
     #chooses best move
     bestMoveNode = rootNode.bestChild(explorationWeight=0)
     return bestMoveNode.lastMoveTaken
-
-
