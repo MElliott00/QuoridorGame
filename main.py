@@ -6,6 +6,7 @@ from board import draw_board, placeBarrierAtClick, show_message
 from game_state import QuoridorState
 from mcts import MCTS_Search
 
+pygame.font.init
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Quoridor Game")
@@ -26,8 +27,19 @@ def main():
 
     while game_running:
         screen.fill(WHITE)
-        draw_board(screen, currentState.barriers, currentState.player1_pos, currentState.player2_pos)
+        draw_board(screen, currentState.barriers, currentState.player1_pos, currentState.player2_pos, 
+                   currentState.player1_barriers, currentState.player2_barriers, font)
         
+        #Checks for winner
+        if currentState.isTerminal():
+                winner = currentState.getWinner()
+                show_message(screen, f"Player {winner} wins!", (0, 255, 0),
+                             (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
+                pygame.display.flip()
+                pygame.time.wait(2000)
+                game_running = False
+                continue
+
         if aiTurn:
             show_message(screen, "AI is thinking...", (255, 0, 0),
                          (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
@@ -54,27 +66,22 @@ def main():
                                  pygame.K_LEFT: 'left', pygame.K_RIGHT: 'right'}[event.key]
                     currentState.move_player(direction)
                     aiTurn = (currentState.player_turn == 2)
-                elif event.key == pygame.K_q:
+                elif event.key == pygame.K_h:
                     barrierOrientation = 'horizontal'
-                elif event.key == pygame.K_e:
+                elif event.key == pygame.K_v:
                     barrierOrientation = 'vertical'
         
         # AI turn.
-        if aiTurn:
-            bestMove = MCTS_Search(currentState, iterations=500, ai_player=2)
+        if aiTurn and not currentState.isTerminal():
+            print("Satring MCTS Search")
+            bestMove = MCTS_Search(currentState, iterations=2, ai_player=2) #iterations 
+            print("MCTS Search Complete")
             currentState = currentState.applyMoves(bestMove)
             aiTurn = False
-            if currentState.isTerminal():
-                winner = currentState.getWinner()
-                show_message(screen, f"Player {winner} wins!", (0, 255, 0),
-                             (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), font)
-                pygame.display.flip()
-                pygame.time.wait(2000)
-                game_running = False
 
         pygame.display.flip()
         clock.tick(30)
-
+        
     pygame.quit()
     sys.exit()
 

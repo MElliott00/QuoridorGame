@@ -1,39 +1,61 @@
 # board.py
 import pygame
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, GRID_SIZE, CELL_SIZE, WHITE, BLACK, LIGHT_GRAY, PINK, GREEN, BARRIER_COLOR
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, GRID_SIZE, CELL_SIZE, TEXT_COLOR, BOARD_COLOR, GRID_COLOR, PLAYER1_COLOR, PLAYER2_COLOR, BARRIER_COLOR
 from game_state import QuoridorState
 
-# board.py
-def draw_board(screen, barriers, player1_pos, player2_pos):
+def draw_board(screen, barriers, player1_pos, player2_pos, player1_barriers, player2_barriers, font):
+    # Clear screen
+    screen.fill(BOARD_COLOR)
+
+    # Draw UI bar (above the board)
+    ui_bar_height = 50
+    pygame.draw.rect(screen, GRID_COLOR, (0, 0, SCREEN_WIDTH, ui_bar_height))
+
+    # Draw text inside UI bar
+    p1_text = font.render(f"P1 Barriers: {player1_barriers}", True, TEXT_COLOR)
+    p2_text = font.render(f"P2 Barriers: {player2_barriers}", True, TEXT_COLOR)
+
+    screen.blit(p1_text, (20, 15))  # Left side
+    screen.blit(p2_text, (SCREEN_WIDTH - 200, 15))  # Right side
+
+    # Draw the grid starting below the UI bar
     for row in range(GRID_SIZE):
         for col in range(GRID_SIZE):
-            pygame.draw.rect(screen, LIGHT_GRAY, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
-            pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 2)
+            pygame.draw.rect(screen, BOARD_COLOR,
+                             (col * CELL_SIZE, row * CELL_SIZE + ui_bar_height, CELL_SIZE, CELL_SIZE), 1)
+            pygame.draw.rect(screen, GRID_COLOR,
+                             (col * CELL_SIZE, row * CELL_SIZE + ui_bar_height, CELL_SIZE, CELL_SIZE), 2)
 
+    # Draw barriers
     barrier_thickness = 10
     for wall in barriers:
         row, col, orientation = wall
         if orientation == 'horizontal':
-            # Draw a horizontal wall along the top edge of row 'row'
             pygame.draw.rect(screen, BARRIER_COLOR,
                              (col * CELL_SIZE,
-                              row * CELL_SIZE - barrier_thickness // 2,
+                              row * CELL_SIZE + ui_bar_height - barrier_thickness // 2,
                               CELL_SIZE * 2,
                               barrier_thickness))
         elif orientation == 'vertical':
-            # Draw a vertical wall along the left edge of column 'col'
             pygame.draw.rect(screen, BARRIER_COLOR,
                              (col * CELL_SIZE - barrier_thickness // 2,
-                              row * CELL_SIZE,
+                              row * CELL_SIZE + ui_bar_height,
                               barrier_thickness,
                               CELL_SIZE * 2))
-    pygame.draw.circle(screen, PINK, (player1_pos[1] * CELL_SIZE + CELL_SIZE // 2, player1_pos[0] * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
-    pygame.draw.circle(screen, GREEN, (player2_pos[1] * CELL_SIZE + CELL_SIZE // 2, player2_pos[0] * CELL_SIZE + CELL_SIZE // 2), CELL_SIZE // 3)
 
+    # Draw players
+    pygame.draw.circle(screen, PLAYER1_COLOR, (player1_pos[1] * CELL_SIZE + CELL_SIZE // 2,
+                                      player1_pos[0] * CELL_SIZE + CELL_SIZE // 2 + ui_bar_height),
+                       CELL_SIZE // 3)
+    pygame.draw.circle(screen, PLAYER2_COLOR, (player2_pos[1] * CELL_SIZE + CELL_SIZE // 2,
+                                       player2_pos[0] * CELL_SIZE + CELL_SIZE // 2 + ui_bar_height),
+                       CELL_SIZE // 3)
 
 def getGridPos(mousePos):
     x, y = mousePos
-    return (y // CELL_SIZE, x // CELL_SIZE)
+    if y < 50:  # Clicked in the status bar area
+        return None
+    return ( (y - 50) // CELL_SIZE, x // CELL_SIZE )  # Adjust for the bar height
 
 def placeBarrierAtClick(mousePos, orientation, state):
     row, col = getGridPos(mousePos)
@@ -80,6 +102,18 @@ def placeBarrierAtClick(mousePos, orientation, state):
         state.barriers = original_barriers
         print("Wall placement blocked! Path must remain open.")
         return False
+    
+def barriers_remainig(screen, font, player1_barriers, player2_barriers):
+    
+    p1_text_pos = (20, 20) #player 1
+    p2_text_pos = (20, SCREEN_HEIGHT - 40) #player 2
+
+    p1_text = font.render(f"Player 1 Barriers: {player1_barriers}", True, (255, 255, 255))
+    p2_text = font.render(f"Player 2 Barriers: {player2_barriers}", True, (255, 255, 255))
+
+    screen.blit(p1_text, p1_text_pos)
+    screen.blit(p2_text, p2_text_pos)
+
 def show_message(screen, message, color, position, font):
     text = font.render(message, True, color)
     screen.blit(text, position)
